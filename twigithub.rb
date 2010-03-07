@@ -1,17 +1,19 @@
 require 'sinatra'
 require File.join(File.dirname(__FILE__),'github')
 
-
-
 # Make sure our template can use <%=h
 helpers do
   include Rack::Utils
   alias_method :h, :escape_html
 end
 
+CONFIG = File.join(File.dirname(__FILE__),'github.yml')
+
 get '/' do
-  # Just list all the shouts
-  @projects = Github.new(File.join(File.dirname(__FILE__),'github.yml')).list
+  github = Github.new(CONFIG)
+  @projects = github.list
+  @collaborators ={}
+  @projects.each {|project| @collaborators[project[:name]] = github.collaborators(project[:name])}
   erb :index
 end
 
@@ -20,14 +22,20 @@ post '/' do
 end
 
 post '/add_user' do
-  Github.new(File.join(File.dirname(__FILE__),'github.yml')).add_collaborator(params)
+  Github.new(CONFIG).add_collaborator(params)
   redirect '/'
 end
 
 post '/create_repo' do
-  github = Github.new(File.join(File.dirname(__FILE__),'github.yml'))
+  github = Github.new(CONFIG)
   github.create_repo(params)
   github.add_collaborator(params)
+  redirect '/'
+end
+
+post '/delete_repo' do
+  github = Github.new(CONFIG)
+  github.delete_repo(params)
   redirect '/'
 end
 
@@ -40,10 +48,19 @@ __END__
   </head>
   <body style="font-family: sans-serif;">
     <h1>View all TWI repos</h1>
-
     <ul>
     <% @projects.each do |project| %>
-      <li><a href='<%=project[:url]%>'><%=project[:name]%></a></li>
+      <li><a href='<%=project[:url]%>'><%=project[:name]%></a>
+        <form action="delete_repo" method='post'>
+          <input type="hidden" name="name" value="<%=project[:name]%>">
+          <input type="submit" value="delete">
+        </form>
+        <ul>
+        <% @collaborators[project[:name]].each do |collaborator| %>
+          <li><a href='http://github.com/<%=collaborator%>'><%=collaborator%></a></li>
+        <%end%>  
+        </ul>
+      </li>
     <% end %>
     </ul>
     

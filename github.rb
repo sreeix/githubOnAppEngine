@@ -12,6 +12,12 @@ class Github
     response = AppEngine::URLFetch.fetch("http://github.com/api/v2/yaml/repos/show/#{ @user_name}?login=#{@user_name}&token=#{@api_key}") 
     YAML::load(response.body)["repositories"]
   end
+
+  def collaborators(project)
+    
+    response = AppEngine::URLFetch.fetch("http://github.com/api/v2/yaml/repos/show/#{@user_name}/#{project}/collaborators?login=#{@user_name}&token=#{@api_key}") 
+    YAML::load(response.body)["collaborators"]
+  end
   
   def create_repo(opts={ })
     puts opts.inspect
@@ -20,7 +26,7 @@ class Github
 
   def delete_repo(opts={ })
     url="http://github.com/api/v2/yaml/repos/delete/#{opts[:name]}"
-    response=RestClient.post url,:login=>@user_name,:token=>@api_key
+    response = post url,:login=>@user_name,:token=>@api_key
     delete_token=YAML::load(response.to_s)["delete_token"]
     post url,{:login=>@user_name,:token=>@api_key,:delete_token=>delete_token}
   end
@@ -45,10 +51,22 @@ class Github
      url = URL.new(options.keys.inject(url+"?"){|url, key|url+= "#{key}=#{options[key]}&"});
      connection =  url.openConnection();
      connection.setDoOutput(true);
+     
      connection.setRequestMethod("POST");
      connection.setRequestProperty("token", options[:token]);
      connection.setRequestProperty("login", options[:login]);
+
      puts connection.getResponseCode
+
+       rd = BufferedReader.new InputStreamReader.new(connection.getInputStream())
+     line=""
+     content=""
+     while(not (line = rd.read_line).nil? ) 
+       content << line << "\n"
+     end
+     rd.close
+     puts content
+     content     
    end
   
 end
