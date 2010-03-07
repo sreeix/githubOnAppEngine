@@ -24,6 +24,13 @@ post '/add_user' do
   redirect '/'
 end
 
+post '/create_repo' do
+  github = Github.new(File.join(File.dirname(__FILE__),'github.yml'))
+  github.create_repo(params)
+  github.add_collaborator(params)
+  redirect '/'
+end
+
 __END__
 
 @@ index
@@ -40,9 +47,11 @@ __END__
     <% end %>
     </ul>
     
-    <h1> Add me to the repo </h1>
+    <h1> Add Yourself to the repo </h1>
     <form action="add_user" method='post'>
+      <label>Your github id</label>
       <input type="text" name="collaborator"></input>
+      <label>Project</label>
       <select name="name">
        <%@projects.each do |project| %>
         <option> <%=project[:name]%>  </option>      
@@ -50,8 +59,20 @@ __END__
       </select>
       <input type='submit' value='Add me to the repo'/>
     </form>
+
+    <h1> Add a new repo </h1>
+    <form action="create_repo" method='post'>
+      <label>Your github id</label>
+      <input type="text" name="collaborator"></input>
+
+      <label>Name of the repo</label>
+      <input type="text" name="name"></input>
+
+      <label>Private or </label>
+      <input type="radio" name="visibility" value="public"/>Public
+      <input type="radio" name="visibility" value="private"/>Private
+      <input type='submit' value='Create a new repo'/>
+    </form>
     
-    <div style="position: absolute; bottom: 20px; right: 20px;">
-    <img src="/images/appengine.gif"></div>
   </body>
 </html>

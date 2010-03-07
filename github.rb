@@ -14,7 +14,8 @@ class Github
   end
   
   def create_repo(opts={ })
-    post 'http://github.com/api/v2/yaml/repos/create',{:login=>@user_name,:token=>@api_key,:name=>opts[:name],:public=> (opts[:public]? "1":"0"), :description=>opts[:description],:homepage=>opts[:homepage]}
+    puts opts.inspect
+    post 'http://github.com/api/v2/yaml/repos/create',{:login=>@user_name,:token=>@api_key,:name=>opts[:name], :public=> (opts[:visibility]== 'public' ? "1":"0")}
   end
 
   def delete_repo(opts={ })
@@ -48,7 +49,6 @@ class Github
      connection.setRequestProperty("token", options[:token]);
      connection.setRequestProperty("login", options[:login]);
      puts connection.getResponseCode
-     
    end
   
 end
