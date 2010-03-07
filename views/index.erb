@@ -11,7 +11,7 @@
       <li><a href='<%=project[:url]%>' class ="<%= project[:private]  ? 'private' : 'public' %>" ><%=project[:name]%></a>
         <form action="delete_repo" method='post'>
           <input type="hidden" name="name" value="<%=project[:name]%>">
-          <input type="submit" value="delete">
+          <input type="submit" value="delete" class="btn">
         </form>
         <ul>
         <% @collaborators[project[:name]].each do |collaborator| %>
@@ -20,7 +20,7 @@
             <form action="delete_user" method='post'>
               <input type="hidden" name="name" value="<%=project[:name]%>">
               <input type="hidden" name="collaborator" value="<%=collaborator%>">
-              <input type="submit" value="delete">
+              <input type="submit" value="remove" class="btn">
             </form>
           </li>
         <% end %>  
@@ -39,7 +39,7 @@
         <option> <%=project[:name]%>  </option>      
        <% end %>
       </select>
-      <input type='submit' value='Add me to the repo'/>
+      <input type='submit' value='Add me to the repo' class="btn"/>
     </form>
 
     <h1> Add a new repo </h1>
@@ -52,7 +52,7 @@
 
       <input type="radio" name="visibility" value="public"/>Public
       <input type="radio" name="visibility" value="private"/>Private
-      <input type='submit' value='Create a new repo'/>
+      <input type='submit' value='Create a new repo' class="btn"/>
     </form>
     
   </body>
