@@ -1,4 +1,5 @@
 require 'sinatra'
+require File.join(File.dirname(__FILE__),'Twgithub','lib','github')
 
 
 
@@ -10,14 +11,27 @@ end
 
 get '/' do
   # Just list all the shouts
-  @shouts = Shout.all
+  @projects = Github.new(File.join(File.dirname(__FILE__),'Twgithub','github.yml')).list
   erb :index
 end
 
 post '/' do
-  # Create a new shout and redirect back to the list.
-  shout = Shout.create(:message => params[:message])
   redirect '/'
+end
+
+post '/add_user' do
+  Github.new(File.join(File.dirname(__FILE__),'Twgithub','github.yml')).add_collaborator(params)
+  redirect '/'
+end
+post '/api/*.*' do
+  puts "PARAMS are #{params["splat"]}"
+  redirect '/'
+end
+
+get '/api/*.*' do
+  puts "We are in a get."
+    puts params["splat"]
+    redirect '/'
 end
 
 __END__
@@ -28,17 +42,25 @@ __END__
     <title>Shoutout!</title>
   </head>
   <body style="font-family: sans-serif;">
-    <h1>Shoutout!</h1>
+    <h1>View all TWI repos</h1>
 
-    <form method=post>
-      <textarea name="message" rows="3"></textarea>
-      <input type=submit value=Shout>
-    </form>
-
-    <% @shouts.each do |shout| %>
-    <p>Someone wrote, <q><%=h shout.message %></q></p>
+    <ul>
+    <% @projects.each do |project| %>
+      <li><a href='<%=project[:url]%>'><%=project[:name]%></a></li>
     <% end %>
-
+    </ul>
+    
+    <h1> Add me to the repo </h1>
+    <form action="add_user" method='post'>
+      <input type="text" name="collaborator"></input>
+      <select name="name">
+       <%@projects.each do |project| %>
+        <option> <%=project[:name]%>  </option>      
+       <% end %>
+      </select>
+      <input type='submit' value='Add me to the repo'/>
+    </form>
+    
     <div style="position: absolute; bottom: 20px; right: 20px;">
     <img src="/images/appengine.gif"></div>
   </body>
