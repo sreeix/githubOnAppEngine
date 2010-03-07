@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <title>Shoutout!</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    
+  </head>
+  <body style="font-family: sans-serif;">
+    <h1>View all TWI repos</h1>
+    <ul>
+    <% @projects.each do |project| %>
+      <li><a href='<%=project[:url]%>' class ="<%= project[:private]  ? 'private' : 'public' %>" ><%=project[:name]%></a>
+        <form action="delete_repo" method='post'>
+          <input type="hidden" name="name" value="<%=project[:name]%>">
+          <input type="submit" value="delete">
+        </form>
+        <ul>
+        <% @collaborators[project[:name]].each do |collaborator| %>
+          <li>
+            <a href='http://github.com/<%=collaborator%>'><%= collaborator %></a>
+            <form action="delete_user" method='post'>
+              <input type="hidden" name="name" value="<%=project[:name]%>">
+              <input type="hidden" name="collaborator" value="<%=collaborator%>">
+              <input type="submit" value="delete">
+            </form>
+          </li>
+        <% end %>  
+        </ul>
+      </li>
+    <% end %>
+    </ul>
+    
+    <h1> Add Yourself to the repo </h1>
+    <form action="add_user" method='post'>
+      <label>Your github id</label>
+      <input type="text" name="collaborator"></input>
+      <label>Project</label>
+      <select name="name">
+       <%@projects.each do |project| %>
+        <option> <%=project[:name]%>  </option>      
+       <% end %>
+      </select>
+      <input type='submit' value='Add me to the repo'/>
+    </form>
+
+    <h1> Add a new repo </h1>
+    <form action="create_repo" method='post'>
+      <label>Your github id</label>
+      <input type="text" name="collaborator"></input>
+
+      <label>Name of the repo</label>
+      <input type="text" name="name"></input>
+
+      <input type="radio" name="visibility" value="public"/>Public
+      <input type="radio" name="visibility" value="private"/>Private
+      <input type='submit' value='Create a new repo'/>
+    </form>
+    
+  </body>
+</html>

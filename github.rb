@@ -6,15 +6,14 @@ class Github
     doc=YAML::load(File.read(config))
     @user_name=doc[:user_name]
     @api_key=doc[:api_key]
-    # RestClient.log="/tmp/restclient.log"
   end
+
   def list
     response = AppEngine::URLFetch.fetch("http://github.com/api/v2/yaml/repos/show/#{ @user_name}?login=#{@user_name}&token=#{@api_key}") 
     YAML::load(response.body)["repositories"]
   end
 
   def collaborators(project)
-    
     response = AppEngine::URLFetch.fetch("http://github.com/api/v2/yaml/repos/show/#{@user_name}/#{project}/collaborators?login=#{@user_name}&token=#{@api_key}") 
     YAML::load(response.body)["collaborators"]
   end
@@ -35,6 +34,11 @@ class Github
     url="http://github.com/api/v2/yaml/repos/collaborators/#{options[:name]}/add/#{options[:collaborator]}"
     post url, {:token=>@api_key, :login=>@user_name}
   end
+
+  def remove_collaborator(options)
+    url="http://github.com/api/v2/yaml/repos/collaborators/#{options[:name]}/remove/#{options[:collaborator]}"
+    post url, {:token=>@api_key, :login=>@user_name}
+  end
   
   
   
@@ -47,8 +51,8 @@ class Github
      import java.io.InputStreamReader;
      import java.io.IOException;
      import java.io.OutputStreamWriter;
-      
      url = URL.new(options.keys.inject(url+"?"){|url, key|url+= "#{key}=#{options[key]}&"});
+     puts url
      connection =  url.openConnection();
      connection.setDoOutput(true);
      
@@ -56,9 +60,7 @@ class Github
      connection.setRequestProperty("token", options[:token]);
      connection.setRequestProperty("login", options[:login]);
 
-     puts connection.getResponseCode
-
-       rd = BufferedReader.new InputStreamReader.new(connection.getInputStream())
+     rd = BufferedReader.new InputStreamReader.new(connection.getInputStream())
      line=""
      content=""
      while(not (line = rd.read_line).nil? ) 
@@ -66,6 +68,7 @@ class Github
      end
      rd.close
      puts content
+     puts connection.getResponseCode
      content     
    end
   
