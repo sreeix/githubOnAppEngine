@@ -23,14 +23,14 @@ post '/add_user' do
   Github.new(File.join(File.dirname(__FILE__),'Twgithub','github.yml')).add_collaborator(params)
   redirect '/'
 end
-post '/api/*.*' do
-  puts "PARAMS are #{params["splat"]}"
-  redirect '/'
+post '/api/v2/yaml/repos/collaborators/carbon/add/sreeix' do
+  puts "We are in a post."
+  puts params.inspect
 end
 
-get '/api/*.*' do
+get '/api/v2/yaml/repos/collaborators/carbon/add/sreeix' do
   puts "We are in a get."
-    puts params["splat"]
+    puts params.inspect
     redirect '/'
 end
 
