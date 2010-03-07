@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'optparse'
+require File.join(File.dirname(__FILE__),'..','lib','github')
+
+options = { :config => File.expand_path("github.yml") , :public=>true,:homepage=>"www.thoughtworks.com",:description=>"", :create=>true}
+OptionParser.new do |opts|
+  opts.banner = "Usage: tw-github [options]"
+
+  opts.on( '-f', '--config FILE', "Specify the config file(Default is github.yml)" ) do |f|
+    options[:config] = f
+  end
+  opts.on( '-n', '--repo_name NAME', "Name of a repo" ) do |env|
+    options[:name] = env
+  end
+  opts.on( '-p', '--private', "Add this flag with -n to create a private repo" ) do
+    options[:public] = false
+  end
+  opts.on( '-d', '--description  <describe your project>', "Description of the project that you are creating" ) do |desc|
+    options[:description] = desc
+  end
+
+  opts.on( '-r', '--remove'  , "delete a  repo -n option must be provided" ) do
+    options[:delete] = true
+  end
+
+  opts.on( '-a', '--add collaborator'  , "add a commiter to the repo -n option must be provided" ) do |commiter|
+    options[:collaborator] = commiter
+  end
+
+  opts.on( '-h', '--help'  , "Displays this message" ) do
+    puts opts
+    exit
+  end
+end.parse!
+
+
+github = Github.new(options[:config])
+if options[:name]
+  if  options[:delete]
+    github.delete_repo(options)
+  elsif options[:collaborator]
+    github.add_collaborator(options)
+  else
+    github.create_repo(options)
+  end
+else
+  github.list
+end
